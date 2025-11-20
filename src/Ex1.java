@@ -200,22 +200,24 @@ Ex1 {
 	 * @return
 	 */
 	public static double[] mul(double[] p1, double[] p2) {
-		double [] ans = ZERO;//
-        /** add you code below
-
-         /////////////////// */
-		return ans;
+        double [] ans = new double[p1.length*p2.length];
+        for (int i = 0; i < p1.length; i++) {
+            for (int j = 0; j < p2.length; j++) {
+                ans[i+j]+=p1[i]*p2[j];
+            }
+        }
+        return ans;
 	}
-	/**
-	 * This function computes the derivative of the p0 polynomial function.
-	 * @param po
-	 * @return
-	 */
-	public static double[] derivative (double[] po) {
-		double [] ans = ZERO;//
-        /** add you code below
+    public static double[] derivative(double[] po) {
+        if (po.length <= 1) return new double[]{0};
 
-         /////////////////// */
-		return ans;
-	}
+        double[] ans = new double[po.length - 1];
+
+        for (int i = 1; i < po.length; i++) {
+            ans[i - 1] = po[i] * i;
+        }
+
+        return ans;
+    }
+
 }

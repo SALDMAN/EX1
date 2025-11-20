@@ -223,4 +223,15 @@ class Ex1Test {
 		double area = 58.5658;
 		assertEquals(a1,area, Ex1.EPS);
 	}
+    @Test
+    public void testDerivative() {
+        double[] p1= {3,2,6,4};
+        double[] p2= {2,12,12};
+        double[]ans=Ex1.derivative(p1);
+        for(int i=0;i<ans.length;i=i+1) {
+            if (ans[i]!=p2[i]) {
+                fail();
+            }
+        }
+    }
 }
