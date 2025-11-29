@@ -22,12 +22,6 @@ public class Ex1 {
      * Implemented as a single-element array containing 0.
      */
     public static final double[] ZERO = {0};
-
-    /**
-     * Enumeration of supported computation modes for area calculation.
-     */
-    public enum AreaMode { SIGNED, SIGNED_ABS, INTEGRAL_ABS }
-
     /**
      * Computes the value of a polynomial p(x) for a given x.
      *
