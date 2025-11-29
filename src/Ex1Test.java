@@ -8,9 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * This JUnit class represents a JUnit (unit testing) for Ex1-
  * It contains few testing functions for the polynomial functions as defined in Ex1.
- * Note: you should add additional JUnit testing functions to this class.
- *
- * @author boaz.ben-moshe
+ * @author Yair
  */
 class Ex1Test {
     static final double[] P1 = {2, 0, 3, -1, 0}, P2 = {0.1, 0, 1, 0.1, 3};
@@ -18,6 +16,7 @@ class Ex1Test {
     static double[] po3 = {2, 1, -0.7, -0.02, 0.02};
     static double[] po4 = {-3, 0.61, 0.2};
 
+    /** Tests the f(x) function for simple evaluation at x=0,1,2 */
     @Test
     void testF() {
         double fx0 = Ex1.f(po1, 0);
@@ -28,6 +27,7 @@ class Ex1Test {
         assertEquals(fx2, 6, Ex1.EPS);
     }
 
+    /** Tests that f(x) of sum of polynomials equals sum of f(x) values */
     @Test
     void testF2() {
         double x = Math.PI;
@@ -38,6 +38,7 @@ class Ex1Test {
         assertEquals(f1x + f2x, f12x, Ex1.EPS);
     }
 
+    /** Tests addition and subtraction to recover original polynomial */
     @Test
     void testAdd() {
         double[] p12 = Ex1.add(po1, po2);
@@ -47,6 +48,7 @@ class Ex1Test {
         assertTrue(Ex1.equals(p1, po1));
     }
 
+    /** Tests that addition is commutative */
     @Test
     void testAdd2() {
         double[] p12 = Ex1.add(po1, po2);
@@ -54,12 +56,14 @@ class Ex1Test {
         assertTrue(Ex1.equals(p12, p21));
     }
 
+    /** Tests that adding ZERO polynomial returns the same polynomial */
     @Test
     void testAdd3() {
         double[] p1 = Ex1.add(po1, Ex1.ZERO);
         assertTrue(Ex1.equals(p1, po1));
     }
 
+    /** Tests addition of polynomials of different lengths produces correct length */
     @Test
     void testAdd4() {
         double[] p1 = {2, 4, 3, 2};
@@ -70,6 +74,7 @@ class Ex1Test {
         }
     }
 
+    /** Tests addition result equals expected coefficients */
     @Test
     void testAdd5() {
         double[] p1 = {2, 4, 3, 2};
@@ -79,12 +84,14 @@ class Ex1Test {
         assertTrue(Ex1.equals(p3, expected));
     }
 
+    /** Tests multiplication of a polynomial by ZERO returns ZERO */
     @Test
     void testMul1() {
         double[] p1 = Ex1.mul(po1, Ex1.ZERO);
         assertTrue(Ex1.equals(p1, Ex1.ZERO));
     }
 
+    /** Tests multiplication is commutative */
     @Test
     void testMul2() {
         double[] p12 = Ex1.mul(po1, po2);
@@ -92,6 +99,7 @@ class Ex1Test {
         assertTrue(Ex1.equals(p12, p21));
     }
 
+    /** Tests that multiplication matches pointwise evaluation */
     @Test
     void testMulDoubleArrayDoubleArray() {
         double[] xx = {0, 1, 2, 3, 4.1, -15.2222};
@@ -105,19 +113,21 @@ class Ex1Test {
         }
     }
 
+    /** Tests derivative of polynomial reduces degree correctly */
     @Test
     void testDerivativeArrayDoubleArray() {
-        double[] p = {1, 2, 3}; // 3x^2 + 2x + 1
-        double[] pt = {2, 6};   // 6x + 2
-        double[] dp1 = Ex1.derivative(p); // 2x + 6
-        double[] dp2 = Ex1.derivative(dp1); // 2
-        double[] dp3 = Ex1.derivative(dp2); // 0
-        double[] dp4 = Ex1.derivative(dp3); // 0
+        double[] p = {1, 2, 3};
+        double[] pt = {2, 6};
+        double[] dp1 = Ex1.derivative(p);
+        double[] dp2 = Ex1.derivative(dp1);
+        double[] dp3 = Ex1.derivative(dp2);
+        double[] dp4 = Ex1.derivative(dp3);
         assertTrue(Ex1.equals(dp1, pt));
         assertTrue(Ex1.equals(Ex1.ZERO, dp3));
         assertTrue(Ex1.equals(dp4, dp3));
     }
 
+    /** Tests converting polynomial to string and back from string */
     @Test
     public void testFromString() {
         double[] p = {-1.1, 2.3, 3.1};
@@ -132,6 +142,7 @@ class Ex1Test {
         assertEquals(sp, Ex1.poly(p1));
     }
 
+    /** Tests equals method for polynomials with small differences */
     @Test
     public void testEquals() {
         double[][] d1 = {{0}, {1}, {1, 2, 0, 0}};
@@ -145,6 +156,7 @@ class Ex1Test {
         }
     }
 
+    /** Tests that sameValue returns consistent crossing point between polynomials */
     @Test
     public void testSameValue2() {
         double x1 = -4, x2 = 0;
@@ -153,6 +165,7 @@ class Ex1Test {
         assertEquals(rs1, rs2, Ex1.EPS);
     }
 
+    /** Tests area computation between two polynomials is symmetric */
     @Test
     public void testArea() {
         double x1 = -4, x2 = 0;
@@ -161,6 +174,7 @@ class Ex1Test {
         assertEquals(a1, a2, Ex1.EPS);
     }
 
+    /** Tests area calculation with different number of segments converges */
     @Test
     public void testArea2() {
         double[] po_a = Ex1.ZERO;
@@ -178,6 +192,7 @@ class Ex1Test {
         assertEquals(a100, area, Ex1.EPS);
     }
 
+    /** Tests area calculation for two polynomials with known intersection */
     @Test
     public void testArea3() {
         double[] po_a = {2, 1, -0.7, -0.02, 0.02};
@@ -188,6 +203,7 @@ class Ex1Test {
         assertEquals(a1, area, Ex1.EPS);
     }
 
+    /** Tests derivative with specific coefficients */
     @Test
     public void testDerivative() {
         double[] p1 = {3, 2, 6, 4};
@@ -198,6 +214,7 @@ class Ex1Test {
         }
     }
 
+    /** Tests poly() string formatting of polynomial */
     @Test
     void testPoly() {
         double[] p1 = {7.0, -1.2, 0.0, -1.0, 3.5};
@@ -205,6 +222,7 @@ class Ex1Test {
         assertEquals(expected, Ex1.poly(p1), "Test Case 1 failed: Standard polynomial format error.");
     }
 
+    /** Tests poly() string formatting of more complex polynomial */
     @Test
     void testPoly2() {
         double[] p3 = {3.33, -0.99, 5.55, -1.0, 0.0, 1.0, -2.55};
@@ -212,8 +230,7 @@ class Ex1Test {
         assertEquals(expected, Ex1.poly(p3), "Test Case 3 failed: Complicated polynomial format error.");
     }
 
-    // ================= NEW TESTS ==================
-
+    /** Tests length calculation of a linear polynomial */
     @Test
     void testLengthLinear() {
         double[] p = {0, 2}; // y = 2x
@@ -224,13 +241,15 @@ class Ex1Test {
         assertEquals(expected, len, Ex1.EPS, "Length of linear function incorrect");
     }
 
+    /** Tests length calculation of a quadratic polynomial */
     @Test
     void testLengthQuadratic() {
         double[] p = {0, 0, 1}; // y = x^2
-        double len = Ex1.length(p, 0, 1, 1000); // high segments for accuracy
+        double len = Ex1.length(p, 0, 1, 1000);
         assertEquals(1.4789, len, 0.01, "Length of quadratic function incorrect");
     }
 
+    /** Tests creation of linear polynomial from two points */
     @Test
     void testPolynomFromPointsLinear() {
         double[] xx = {1, 3};
@@ -239,30 +258,25 @@ class Ex1Test {
         assertArrayEquals(new double[]{0, 2}, coeffs, 1e-6, "Linear polynomial from points incorrect");
     }
 
+    /** Tests creation of quadratic polynomial from three points */
     @Test
     void testPolynomFromPointsQuadratic() {
         double[] xx = {0, 1, 2};
-        double[] yy = {1, 6, 17}; // y = 2x^2 + 3x + 1
+        double[] yy = {1, 6, 17};
         double[] coeffs = Ex1.PolynomFromPoints(xx, yy);
         assertArrayEquals(new double[]{1, 2, 3}, coeffs, 1e-6, "Quadratic polynomial from points incorrect");
     }
 
+    /** Tests creation of quadratic polynomial with different points */
     @Test
     void testPolynomFromPointsQuadratic2() {
         double[] xx = {0, 1, 2};
-        double[] yy = {6, 1, 17}; // y = 2x^2 - x + 1
+        double[] yy = {6, 1, 17};
         double[] coeffs = Ex1.PolynomFromPoints(xx, yy);
-
-        // Print coefficients for debugging
-        for (int i = 0; i < coeffs.length; i++) {
-            System.out.println(coeffs[i]); // should print: 1.0 -1.0 2.0
-        }
-
-        // Expected: {constant, linear, quadratic} = {c, b, a}
         assertArrayEquals(new double[]{6,-15.5, 10.5}, coeffs, 1e-6, "Quadratic polynomial from points incorrect (test 2)");
     }
 
-
+    /** Tests invalid points (same x-values) return null */
     @Test
     void testPolynomFromPointsInvalid() {
         double[] xx = {1, 1};

@@ -8,8 +8,8 @@
  * uses the StdDraw (see: https://introcs.cs.princeton.edu/java/stdlib/javadoc/StdDraw.html) 
  * in order to draw two polynoms in a defined range.
  * Make sure you follow all the examples below, there is no need to change this class
- * @author boaz.benmoshe
- */
+ *
+ **/
 public class Ex1_GUI {
 	public static void main(String[] a) {
 		double min = -10, max=10;

@@ -3,44 +3,79 @@ import java.util.Collections;
 import java.util.List;
 import java.lang.Math;
 
+/**
+ * A utility class for performing common mathematical operations on real-valued
+ * polynomials represented by coefficient arrays.
+ * This class is the second assignment counts from 0 in course Intro to computer science in Ariel University.
+ * @author Yair
+ */
 public class Ex1 {
-    /** Epsilon value for numerical computation, it serves as a "close enough" threshold. */
+
+    /**
+     * Epsilon value used as tolerance threshold for floating-point comparison.
+     * Two values are considered equal if their absolute difference is below EPS.
+     */
     public static final double EPS = 0.001;
-    /** The zero polynomial function is represented as an array with a single (0) entry. */
+
+    /**
+     * Represents the zero polynomial, p(x) = 0.
+     * Implemented as a single-element array containing 0.
+     */
     public static final double[] ZERO = {0};
+
+    /**
+     * Enumeration of supported computation modes for area calculation.
+     */
     public enum AreaMode { SIGNED, SIGNED_ABS, INTEGRAL_ABS }
 
-
+    /**
+     * Computes the value of a polynomial p(x) for a given x.
+     *
+     * @param poly The polynomial coefficients array.
+     * @param x The x-value where f(x) is evaluated.
+     * @return The computed value f(x).
+     */
     public static double f(double[] poly, double x) {
         double ans = 0;
-        for(int i=0;i<poly.length;i++) {
-            double c = Math.pow(x, i);
-            ans += c*poly[i];
+        for(int i = 0; i < poly.length; i++) {
+            ans += poly[i] * Math.pow(x, i);
         }
         return ans;
     }
 
+    /**
+     * Recursively finds a root of the polynomial p(x) within interval [x1, x2]
+     * using a binary search (bisection) method.
+     *
+     * @param p   The polynomial.
+     * @param x1  Left boundary of interval.
+     * @param x2  Right boundary of interval.
+     * @param eps Stopping threshold for interval size or function value.
+     * @return An approximate root of p(x) in the interval.
+     */
     public static double root_rec(double[] p, double x1, double x2, double eps) {
-        double f1 = f(p,x1);
+        double f1 = f(p, x1);
 
         if (x2 - x1 < eps) {
             return (x1 + x2) / 2.0;
         }
 
-        double x12 = (x1+x2)/2;
-        double f12 = f(p,x12);
+        double mid = (x1 + x2) / 2;
+        double fMid = f(p, mid);
 
-        if (Math.abs(f12) < eps) {
-            return x12;
-        }
+        if (Math.abs(fMid) < eps) return mid;
 
-        if (f1 * f12 <= 0) {
-            return root_rec(p, x1, x12, eps);
-        } else {
-            return root_rec(p, x12, x2, eps);
-        }
+        if (f1 * fMid <= 0) return root_rec(p, x1, mid, eps);
+        else return root_rec(p, mid, x2, eps);
     }
 
+    /**
+     * Constructs a polynomial of degree 1 or 2 that exactly fits 2 or 3 given points.
+     *
+     * @param xx x-coordinates of given points.
+     * @param yy y-coordinates of given points.
+     * @return Polynomial coefficients array or null if invalid input.
+     */
     public static double[] PolynomFromPoints(double[] xx, double[] yy) {
         if (xx == null || yy == null || xx.length != yy.length || xx.length < 2 || xx.length > 3) {
             return null;
@@ -49,7 +84,6 @@ public class Ex1 {
         int n = xx.length;
 
         if (n == 2) {
-            // Linear: y = a*x + b
             double x0 = xx[0], y0 = yy[0];
             double x1 = xx[1], y1 = yy[1];
 
@@ -58,16 +92,14 @@ public class Ex1 {
             double a = (y1 - y0) / (x1 - x0);
             double b = y0 - a * x0;
 
-            return new double[]{b, a}; // {constant, linear}
+            return new double[]{b, a};
         }
 
         if (n == 3) {
-            // Quadratic: y = a*x^2 + b*x + c
             double x0 = xx[0], y0 = yy[0];
             double x1 = xx[1], y1 = yy[1];
             double x2 = xx[2], y2 = yy[2];
 
-            // Solve system using determinants (Cramer's rule)
             double det = x0*x0*(x1 - x2) - x1*x1*(x0 - x2) + x2*x2*(x0 - x1);
             if (Math.abs(det) < Ex1.EPS) return null;
 
@@ -75,12 +107,19 @@ public class Ex1 {
             double b = (y0*(x2*x2 - x1*x1) - y1*(x2*x2 - x0*x0) + y2*(x1*x1 - x0*x0)) / det;
             double c = (y0*(x1*x2*(x1 - x2)) - y1*(x0*x2*(x0 - x2)) + y2*(x0*x1*(x0 - x1))) / det;
 
-            return new double[]{c, b, a}; // {constant, linear, quadratic}
+            return new double[]{c, b, a};
         }
 
         return null;
     }
 
+    /**
+     * Checks equality of two polynomials by evaluating them at several sample points.
+     *
+     * @param p1 First polynomial.
+     * @param p2 Second polynomial.
+     * @return true if polynomials represent the same function within tolerance.
+     */
     public static boolean equals(double[] p1, double[] p2) {
         int n = Math.max(p1.length, p2.length) - 1;
         for (int i = 0; i <= n + 1; i++) {
@@ -91,16 +130,10 @@ public class Ex1 {
     }
 
     /**
-     * Computes a String representing the polynomial function.
-     */
-    /**
-     * Computes a String representing the polynomial function.
-     */
-    /**
-     * Computes a String representing the polynomial function with correct signs.
-     */
-    /**
-     * Computes a String representing the polynomial function with correct signs.
+     * Converts a polynomial into a human-readable algebraic string.
+     *
+     * @param poly Polynomial coefficients.
+     * @return String representation of the polynomial.
      */
     public static String poly(double[] poly) {
         if (poly == null || poly.length == 0) return "0.0";
@@ -108,60 +141,46 @@ public class Ex1 {
         StringBuilder sb = new StringBuilder();
         boolean firstTerm = true;
 
-        // עובר על המקדמים מהדרגה הגבוהה לנמוכה
         for (int i = poly.length - 1; i >= 0; i--) {
             double coef = poly[i];
-
-            // דלג על מקדמים אפסיים (תוך שימוש ב-EPS המוגדר במחלקה)
             if (Math.abs(coef) < EPS) continue;
 
-            // --- טיפול בסימן וברווח ---
             if (!firstTerm) {
-                // אם זה לא האיבר הראשון:
-                // אם המקדם חיובי, הוסף " + ".
-                // אם המקדם שלילי, הוסף " - ".
                 sb.append(coef >= 0 ? " + " : " - ");
             } else {
-                // אם זה האיבר הראשון:
-                // אם המקדם שלילי, הוסף "-". אחרת, לא מוסיפים סימן +.
                 if (coef < 0) sb.append("-");
                 firstTerm = false;
             }
 
-            // --- טיפול בערך המקדם ---
             double abs = Math.abs(coef);
-
-            // דרגה 0 (קבוע)
-            if (i == 0) {
-                sb.append(String.format("%.2f", abs));
-            }
-            // דרגה 1 ומעלה (עם x)
+            if (i == 0) sb.append(String.format("%.2f", abs));
             else {
-                // אם המקדם המוחלט שונה מ-1 (בטווח EPS), מדפיסים אותו.
-                if (Math.abs(abs - 1.0) > EPS) {
-                    sb.append(String.format("%.2f", abs));
-                }
-
+                if (Math.abs(abs - 1.0) > EPS) sb.append(String.format("%.2f", abs));
                 sb.append("x");
-
-                // דרגה > 1
-                if (i > 1) {
-                    sb.append("^").append(i);
-                }
+                if (i > 1) sb.append("^").append(i);
             }
         }
 
-        // אין צורך ב-trim() מכיוון שטיפלנו ברווחים באופן מדויק.
         return firstTerm ? "0.0" : sb.toString();
     }
 
+    /**
+     * Finds an x in [x1, x2] such that p1(x) == p2(x).
+     *
+     * @param p1 First polynomial.
+     * @param p2 Second polynomial.
+     * @param x1 Interval start.
+     * @param x2 Interval end.
+     * @param eps Accuracy threshold.
+     * @return Intersection x-value or NaN if none found.
+     */
     public static double sameValue(double[] p1, double[] p2,
                                    double x1, double x2, double eps) {
 
         double prevX = x1;
         double prevVal = f(p1, prevX) - f(p2, prevX);
 
-        int samples = 500000;         // דגימה מאוד צפופה
+        int samples = 500000;
         double step = (x2 - x1) / samples;
 
         for (int i = 1; i <= samples; i++) {
@@ -169,7 +188,6 @@ public class Ex1 {
             double currVal = f(p1, x) - f(p2, x);
 
             if (prevVal * currVal <= 0) {
-                // מצאנו קטע עם שינוי סימן -> עושים חיפוש בינארי על הקטע הזה
                 return rootBinary(p1, p2, prevX, x, eps);
             }
 
@@ -180,8 +198,15 @@ public class Ex1 {
         return Double.NaN;
     }
 
-
-
+    /**
+     * Estimates the arc length of the polynomial curve between x1 and x2.
+     *
+     * @param p The polynomial.
+     * @param x1 Start of interval.
+     * @param x2 End of interval.
+     * @param numberOfSegments Number of linear subdivisions.
+     * @return Approximate arc length.
+     */
     public static double length(double[] p, double x1, double x2, int numberOfSegments) {
         if (numberOfSegments <= 0) throw new IllegalArgumentException("numberOfSegments must be positive");
 
@@ -205,6 +230,16 @@ public class Ex1 {
         return length;
     }
 
+    /**
+     * Computes numeric area between two polynomials p1 and p2 over [x1, x2].
+     *
+     * @param p1 First polynomial.
+     * @param p2 Second polynomial.
+     * @param x1 Start of interval.
+     * @param x2 End of interval.
+     * @param n  Number of trapezoids.
+     * @return Approximate area (always non-negative).
+     */
     public static double area(double[] p1, double[] p2, double x1, double x2, int n) {
         if (n <= 0) throw new IllegalArgumentException("n must be positive");
         if (x1 > x2) { double t = x1; x1 = x2; x2 = t; }
@@ -220,14 +255,11 @@ public class Ex1 {
             double fRight = f(p1, right) - f(p2, right);
 
             if (fLeft * fRight < 0) {
-                // יש חיתוך בתוך הטרפז
                 double root = rootBinary(p1, p2, left, right, EPS);
-                // חישוב שטח בנפרד לכל חלק
                 double area1 = (Math.abs(f(p1, left) - f(p2, left)) + Math.abs(f(p1, root) - f(p2, root))) / 2.0 * (root - left);
                 double area2 = (Math.abs(f(p1, root) - f(p2, root)) + Math.abs(f(p1, right) - f(p2, right))) / 2.0 * (right - root);
                 totalArea += area1 + area2;
             } else {
-                // טרפז רגיל
                 totalArea += (Math.abs(fLeft) + Math.abs(fRight)) / 2.0 * dx;
             }
         }
@@ -235,9 +267,6 @@ public class Ex1 {
         return totalArea;
     }
 
-
-
-    // rootBinary מדויק
     private static double rootBinary(double[] p1, double[] p2, double left, double right, double eps) {
         while (right - left > eps) {
             double mid = (left + right) / 2.0;
@@ -250,19 +279,19 @@ public class Ex1 {
         return (left + right) / 2.0;
     }
 
-
-
-
+    /**
+     * Parses a polynomial string into coefficient array.
+     *
+     * @param p String representation of a polynomial.
+     * @return Coefficient array.
+     */
     public static double[] getPolynomFromString(String p) {
         if (p == null || p.isEmpty()) return new double[]{0};
 
         String cleaned = p.replaceAll("\\s+", "");
         if (cleaned.isEmpty()) return new double[]{0};
 
-        // החלפת - ב-+-, אך רק אם הוא לא בתחילת המחרוזת
-        if (cleaned.startsWith("-")) {
-            cleaned = "0" + cleaned;
-        }
+        if (cleaned.startsWith("-")) cleaned = "0" + cleaned;
         cleaned = cleaned.replace("-", "+-");
         String[] monoms = cleaned.split("\\+");
 
@@ -283,19 +312,12 @@ public class Ex1 {
                 int indexX = cleanMonom.indexOf("x");
                 degree = Integer.parseInt(cleanMonom.substring(cleanMonom.indexOf("^") + 1));
                 String coefStr = cleanMonom.substring(0, indexX);
-
-                if (coefStr.isEmpty()) coeff = 1.0;
-                else coeff = Double.parseDouble(coefStr);
-            }
-            else if (cleanMonom.contains("x")) {
+                coeff = coefStr.isEmpty() ? 1.0 : Double.parseDouble(coefStr);
+            } else if (cleanMonom.contains("x")) {
                 degree = 1;
-                int indexX = cleanMonom.indexOf("x");
-                String coefStr = cleanMonom.substring(0, indexX);
-
-                if (coefStr.isEmpty()) coeff = 1.0;
-                else coeff = Double.parseDouble(coefStr);
-            }
-            else {
+                String coefStr = cleanMonom.substring(0, cleanMonom.indexOf("x"));
+                coeff = coefStr.isEmpty() ? 1.0 : Double.parseDouble(coefStr);
+            } else {
                 degree = 0;
                 coeff = Double.parseDouble(cleanMonom);
             }
@@ -307,15 +329,10 @@ public class Ex1 {
         }
 
         double[] ans = new double[maxDegree + 1];
-        for (double[] mono : parsedMonoms) {
-            ans[(int) mono[1]] += mono[0];
-        }
+        for (double[] mono : parsedMonoms) ans[(int) mono[1]] += mono[0];
 
-        // צמצום אפסים מובילים
         int effectiveLen = ans.length;
-        while (effectiveLen > 1 && Math.abs(ans[effectiveLen - 1]) < EPS) {
-            effectiveLen--;
-        }
+        while (effectiveLen > 1 && Math.abs(ans[effectiveLen - 1]) < EPS) effectiveLen--;
 
         if (effectiveLen < ans.length) {
             double[] trimmedAns = new double[effectiveLen];
@@ -326,6 +343,13 @@ public class Ex1 {
         return ans;
     }
 
+    /**
+     * Adds two polynomials.
+     *
+     * @param p1 First polynomial.
+     * @param p2 Second polynomial.
+     * @return Sum polynomial.
+     */
     public static double[] add(double[] p1, double[] p2) {
         int maxLen = Math.max(p1.length, p2.length);
         double [] ans = new double[maxLen];
@@ -336,16 +360,10 @@ public class Ex1 {
             ans[i] = c1 + c2;
         }
 
-        // צמצום אפסים מובילים
         int effectiveLen = ans.length;
-        while (effectiveLen > 1 && Math.abs(ans[effectiveLen - 1]) < EPS) {
-            effectiveLen--;
-        }
+        while (effectiveLen > 1 && Math.abs(ans[effectiveLen - 1]) < EPS) effectiveLen--;
 
-        // אם הצמצום הפך את המערך לפולינום האפס (אורך 1, ערך 0)
-        if (effectiveLen == 1 && Math.abs(ans[0]) < EPS) {
-            return ZERO;
-        }
+        if (effectiveLen == 1 && Math.abs(ans[0]) < EPS) return ZERO;
 
         if (effectiveLen < ans.length) {
             double[] trimmedAns = new double[effectiveLen];
@@ -356,6 +374,13 @@ public class Ex1 {
         return ans;
     }
 
+    /**
+     * Multiplies two polynomials.
+     *
+     * @param p1 First polynomial.
+     * @param p2 Second polynomial.
+     * @return Product polynomial.
+     */
     public static double[] mul(double[] p1, double[] p2) {
         if (p1 == null || p2 == null || p1.length == 0 || p2.length == 0) return ZERO;
 
@@ -367,11 +392,8 @@ public class Ex1 {
             }
         }
 
-        // צמצום אפסים מובילים (כפל אפס בפולינום צריך להחזיר רק {0})
         int effectiveLen = ans.length;
-        while (effectiveLen > 1 && Math.abs(ans[effectiveLen - 1]) < EPS) {
-            effectiveLen--;
-        }
+        while (effectiveLen > 1 && Math.abs(ans[effectiveLen - 1]) < EPS) effectiveLen--;
 
         if (effectiveLen < ans.length) {
             double[] trimmedAns = new double[effectiveLen];
@@ -382,6 +404,12 @@ public class Ex1 {
         return ans;
     }
 
+    /**
+     * Computes the derivative polynomial of p(x).
+     *
+     * @param po Polynomial coefficients.
+     * @return The derivative polynomial.
+     */
     public static double[] derivative(double[] po) {
         if (po.length <= 1) return new double[]{0};
 
