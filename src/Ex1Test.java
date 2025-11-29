@@ -1,302 +1,272 @@
-
 import org.junit.jupiter.api.Test;
 import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *  * Introduction to Computer Science 2026, Ariel University,
- *  * Ex1: arrays, static functions and JUnit
+ * Introduction to Computer Science 2026, Ariel University,
+ * Ex1: arrays, static functions and JUnit
  *
  * This JUnit class represents a JUnit (unit testing) for Ex1-
- * It contains few testing functions for the polynomial functions as define in Ex1.
+ * It contains few testing functions for the polynomial functions as defined in Ex1.
  * Note: you should add additional JUnit testing functions to this class.
  *
  * @author boaz.ben-moshe
  */
-
 class Ex1Test {
-	static final double[] P1 ={2,0,3, -1,0}, P2 = {0.1,0,1, 0.1,3};
-	static double[] po1 = {2,2}, po2 = {-3, 0.61, 0.2};;
-	static double[] po3 = {2,1,-0.7, -0.02,0.02};
-	static double[] po4 = {-3, 0.61, 0.2};
+    static final double[] P1 = {2, 0, 3, -1, 0}, P2 = {0.1, 0, 1, 0.1, 3};
+    static double[] po1 = {2, 2}, po2 = {-3, 0.61, 0.2};
+    static double[] po3 = {2, 1, -0.7, -0.02, 0.02};
+    static double[] po4 = {-3, 0.61, 0.2};
 
- 	@Test
-	/**
-	 * Tests that f(x) == poly(x).
-	 */
-	void testF() {
-		double fx0 =Ex1.f(po1, 0);
-		double fx1 = Ex1.f(po1, 1);
-		double fx2 = Ex1.f(po1, 2);
-		assertEquals(fx0, 2, Ex1.EPS);
-		assertEquals(fx1, 4,Ex1.EPS);
-		assertEquals(fx2, 6, Ex1.EPS);
-	}
-	@Test
-	/**
-	 * Tests that p1(x) + p2(x) == (p1+p2)(x)
-	 */
-	void testF2() {
-		double x = Math.PI;
-		double[] po12 = Ex1.add(po1, po2);
-		double f1x = Ex1.f(po1, x);
-		double f2x = Ex1.f(po2, x);
-		double f12x = Ex1.f(po12, x);
-		assertEquals(f1x + f2x, f12x, Ex1.EPS);
-	}
-	@Test
-	/**
-	 * Tests that p1+p2+ (-1*p2) == p1
-	 */
-	void testAdd() {
-		double[] p12 = Ex1.add(po1, po2);
-		double[] minus1 = {-1};
-		double[] pp2 = Ex1.mul(po2, minus1);
-		double[] p1 = Ex1.add(p12, pp2);
-		assertTrue(Ex1.equals(p1, po1));
-	}
-	@Test
-	/**
-	 * Tests that p1+p2 == p2+p1
-	 */
-	void testAdd2() {
-		double[] p12 = Ex1.add(po1, po2);
-		double[] p21 = Ex1.add(po2, po1);
-		assertTrue(Ex1.equals(p12, p21));
-	}
-	@Test
-	/**
-	 * Tests that p1+0 == p1
-	 */
-	void testAdd3() {
-		double[] p1 = Ex1.add(po1, Ex1.ZERO);
-		assertTrue(Ex1.equals(p1, po1));
-	}
+    @Test
+    void testF() {
+        double fx0 = Ex1.f(po1, 0);
+        double fx1 = Ex1.f(po1, 1);
+        double fx2 = Ex1.f(po1, 2);
+        assertEquals(fx0, 2, Ex1.EPS);
+        assertEquals(fx1, 4, Ex1.EPS);
+        assertEquals(fx2, 6, Ex1.EPS);
+    }
 
-    /**
-     * Tests if the length if the length of the sum is as expected
-     */
+    @Test
+    void testF2() {
+        double x = Math.PI;
+        double[] po12 = Ex1.add(po1, po2);
+        double f1x = Ex1.f(po1, x);
+        double f2x = Ex1.f(po2, x);
+        double f12x = Ex1.f(po12, x);
+        assertEquals(f1x + f2x, f12x, Ex1.EPS);
+    }
+
+    @Test
+    void testAdd() {
+        double[] p12 = Ex1.add(po1, po2);
+        double[] minus1 = {-1};
+        double[] pp2 = Ex1.mul(po2, minus1);
+        double[] p1 = Ex1.add(p12, pp2);
+        assertTrue(Ex1.equals(p1, po1));
+    }
+
+    @Test
+    void testAdd2() {
+        double[] p12 = Ex1.add(po1, po2);
+        double[] p21 = Ex1.add(po2, po1);
+        assertTrue(Ex1.equals(p12, p21));
+    }
+
+    @Test
+    void testAdd3() {
+        double[] p1 = Ex1.add(po1, Ex1.ZERO);
+        assertTrue(Ex1.equals(p1, po1));
+    }
+
     @Test
     void testAdd4() {
-        double[] p1 = {2,4,3,2};
-        double[] p2 = {3,2};
+        double[] p1 = {2, 4, 3, 2};
+        double[] p2 = {3, 2};
         double[] p3 = Ex1.add(p1, p2);
-        if (p3.length !=4) {
+        if (p3.length != 4) {
             fail();
         }
     }
+
     @Test
     void testAdd5() {
-        double[] p1 = {2,4,3,2};
-        double[] p2 = {3,2};
+        double[] p1 = {2, 4, 3, 2};
+        double[] p2 = {3, 2};
         double[] p3 = Ex1.add(p1, p2);
-        double[] expected = {5,6,3,2};
+        double[] expected = {5, 6, 3, 2};
         assertTrue(Ex1.equals(p3, expected));
     }
-	@Test
-	/**
-	 * Tests that p1*0 == 0
-	 */
-	void testMul1() {
-		double[] p1 = Ex1.mul(po1, Ex1.ZERO);
-		assertTrue(Ex1.equals(p1, Ex1.ZERO));
-	}
-	@Test
-	/**
-	 * Tests that p1*p2 == p2*p1
-	 */
-	void testMul2() {
-		double[] p12 = Ex1.mul(po1, po2);
-		double[] p21 = Ex1.mul(po2, po1);
-		assertTrue(Ex1.equals(p12, p21));
-	}
-	@Test
-	/**
-	 * Tests that p1(x) * p2(x) = (p1*p2)(x),
-	 */
-	void testMulDoubleArrayDoubleArray() {
-		double[] xx = {0,1,2,3,4.1,-15.2222};
-		double[] p12 = Ex1.mul(po1, po2);
-		for(int i = 0;i<xx.length;i=i+1) {
-			double x = xx[i];
-			double f1x = Ex1.f(po1, x);
-			double f2x = Ex1.f(po2, x);
-			double f12x = Ex1.f(p12, x);
-			assertEquals(f12x, f1x*f2x, Ex1.EPS);
-		}
-	}
-	@Test
-	/**
-	 * Tests a simple derivative examples - till ZERO.
-	 */
-	void testDerivativeArrayDoubleArray() {
-		double[] p = {1,2,3}; // 3X^2+2x+1
-		double[] pt = {2,6}; // 6x+2
-		double[] dp1 = Ex1.derivative(p); // 2x + 6
-		double[] dp2 = Ex1.derivative(dp1); // 2
-		double[] dp3 = Ex1.derivative(dp2); // 0
-		double[] dp4 = Ex1.derivative(dp3); // 0
-		assertTrue(Ex1.equals(dp1, pt));
-		assertTrue(Ex1.equals(Ex1.ZERO, dp3));
-		assertTrue(Ex1.equals(dp4, dp3));
-	}
-	@Test
-	/**
-	 * Tests the parsing of a polynom in a String like form.
-	 */
-	public void testFromString() {
-		double[] p = {-1.1,2.3,3.1}; // 3.1X^2+ 2.3x -1.1
-		String sp2 = "3.1x^2 +2.3x -1.1";
-		String sp = Ex1.poly(p);
-		double[] p1 = Ex1.getPolynomFromString(sp);
-		double[] p2 = Ex1.getPolynomFromString(sp2);
-		boolean isSame1 = Ex1.equals(p1, p);
-		boolean isSame2 = Ex1.equals(p2, p);
-		if(!isSame1) {fail();}
-		if(!isSame2) {fail();}
-		assertEquals(sp, Ex1.poly(p1));
-	}
-	@Test
-	/**
-	 * Tests the equality of pairs of arrays.
-	 */
-	public void testEquals() {
-		double[][] d1 = {{0}, {1}, {1,2,0,0}};
-		double[][] d2 = {Ex1.ZERO, {1+ Ex1.EPS/2}, {1,2}};
-		double[][] xx = {{-2* Ex1.EPS}, {1+ Ex1.EPS*1.2}, {1,2, Ex1.EPS/2}};
-		for(int i=0;i<d1.length;i=i+1) {
-			assertTrue(Ex1.equals(d1[i], d2[i]));
-		}
-		for(int i=0;i<d1.length;i=i+1) {
-			assertFalse(Ex1.equals(d1[i], xx[i]));
-		}
-	}
 
-	@Test
-	/**
-	 * Tests is the sameValue function is symmetric.
-	 */
-	public void testSameValue2() {
-		double x1=-4, x2=0;
-		double rs1 = Ex1.sameValue(po1,po2, x1, x2, Ex1.EPS);
-		double rs2 = Ex1.sameValue(po2,po1, x1, x2, Ex1.EPS);
-		assertEquals(rs1,rs2, Ex1.EPS);
-	}
-	@Test
-	/**
-	 * Test the area function - it should be symmetric.
-	 */
-	public void testArea() {
-		double x1=-4, x2=0;
-		double a1 = Ex1.area(po1, po2, x1, x2, 100);
-		double a2 = Ex1.area(po2, po1, x1, x2, 100);
-		assertEquals(a1,a2, Ex1.EPS);
-}
-	@Test
-	/**
-	 * Test the area f1(x)=0, f2(x)=x;
-	 */
-	public void testArea2() {
-		double[] po_a = Ex1.ZERO;
-		double[] po_b = {0,1};
-		double x1 = -1;
-		double x2 = 2;
-		double a1 = Ex1.area(po_a,po_b, x1, x2, 1);
-		double a2 = Ex1.area(po_a,po_b, x1, x2, 2);
-		double a3 = Ex1.area(po_a,po_b, x1, x2, 3);
-		double a100 = Ex1.area(po_a,po_b, x1, x2, 100);
-		double area =2.5;
-		assertEquals(a1,area, Ex1.EPS);
-		assertEquals(a2,area, Ex1.EPS);
-		assertEquals(a3,area, Ex1.EPS);
-		assertEquals(a100,area, Ex1.EPS);
-	}
-    /**
     @Test
-    void testSameValue() {
-        double[] p1 = {0, 1}; // p1(x) = x
-        double[] p2 = {0};    // p2(x) = 0
-        double x1 = 0;
+    void testMul1() {
+        double[] p1 = Ex1.mul(po1, Ex1.ZERO);
+        assertTrue(Ex1.equals(p1, Ex1.ZERO));
+    }
+
+    @Test
+    void testMul2() {
+        double[] p12 = Ex1.mul(po1, po2);
+        double[] p21 = Ex1.mul(po2, po1);
+        assertTrue(Ex1.equals(p12, p21));
+    }
+
+    @Test
+    void testMulDoubleArrayDoubleArray() {
+        double[] xx = {0, 1, 2, 3, 4.1, -15.2222};
+        double[] p12 = Ex1.mul(po1, po2);
+        for (int i = 0; i < xx.length; i++) {
+            double x = xx[i];
+            double f1x = Ex1.f(po1, x);
+            double f2x = Ex1.f(po2, x);
+            double f12x = Ex1.f(p12, x);
+            assertEquals(f12x, f1x * f2x, Ex1.EPS);
+        }
+    }
+
+    @Test
+    void testDerivativeArrayDoubleArray() {
+        double[] p = {1, 2, 3}; // 3x^2 + 2x + 1
+        double[] pt = {2, 6};   // 6x + 2
+        double[] dp1 = Ex1.derivative(p); // 2x + 6
+        double[] dp2 = Ex1.derivative(dp1); // 2
+        double[] dp3 = Ex1.derivative(dp2); // 0
+        double[] dp4 = Ex1.derivative(dp3); // 0
+        assertTrue(Ex1.equals(dp1, pt));
+        assertTrue(Ex1.equals(Ex1.ZERO, dp3));
+        assertTrue(Ex1.equals(dp4, dp3));
+    }
+
+    @Test
+    public void testFromString() {
+        double[] p = {-1.1, 2.3, 3.1};
+        String sp2 = "3.1x^2 +2.3x -1.1";
+        String sp = Ex1.poly(p);
+        double[] p1 = Ex1.getPolynomFromString(sp);
+        double[] p2 = Ex1.getPolynomFromString(sp2);
+        boolean isSame1 = Ex1.equals(p1, p);
+        boolean isSame2 = Ex1.equals(p2, p);
+        if (!isSame1) fail();
+        if (!isSame2) fail();
+        assertEquals(sp, Ex1.poly(p1));
+    }
+
+    @Test
+    public void testEquals() {
+        double[][] d1 = {{0}, {1}, {1, 2, 0, 0}};
+        double[][] d2 = {Ex1.ZERO, {1 + Ex1.EPS / 2}, {1, 2}};
+        double[][] xx = {{-2 * Ex1.EPS}, {1 + Ex1.EPS * 1.2}, {1, 2, Ex1.EPS / 2}};
+        for (int i = 0; i < d1.length; i++) {
+            assertTrue(Ex1.equals(d1[i], d2[i]));
+        }
+        for (int i = 0; i < d1.length; i++) {
+            assertFalse(Ex1.equals(d1[i], xx[i]));
+        }
+    }
+
+    @Test
+    public void testSameValue2() {
+        double x1 = -4, x2 = 0;
+        double rs1 = Ex1.sameValue(po1, po2, x1, x2, Ex1.EPS);
+        double rs2 = Ex1.sameValue(po2, po1, x1, x2, Ex1.EPS);
+        assertEquals(rs1, rs2, Ex1.EPS);
+    }
+
+    @Test
+    public void testArea() {
+        double x1 = -4, x2 = 0;
+        double a1 = Ex1.area(po1, po2, x1, x2, 100);
+        double a2 = Ex1.area(po2, po1, x1, x2, 100);
+        assertEquals(a1, a2, Ex1.EPS);
+    }
+
+    @Test
+    public void testArea2() {
+        double[] po_a = Ex1.ZERO;
+        double[] po_b = {0, 1};
+        double x1 = -1;
         double x2 = 2;
-        double eps = Ex1.EPS;
-
-        double x = Ex1.sameValue(p1, p2, x1, x2, eps);
-
-        // בדיקה שה-x בטווח
-        assertTrue(x >= x1 && x <= x2);
-
-        // בדיקה שההפרש קטן מ-eps
-        double diff = Math.abs(Ex1.evaluate(p1, x) - Ex1.evaluate(p2, x));
-        assertTrue(diff < eps);
+        double a1 = Ex1.area(po_a, po_b, x1, x2, 1);
+        double a2 = Ex1.area(po_a, po_b, x1, x2, 2);
+        double a3 = Ex1.area(po_a, po_b, x1, x2, 3);
+        double a100 = Ex1.area(po_a, po_b, x1, x2, 100);
+        double area = 2.5;
+        assertEquals(a1, area, Ex1.EPS);
+        assertEquals(a2, area, Ex1.EPS);
+        assertEquals(a3, area, Ex1.EPS);
+        assertEquals(a100, area, Ex1.EPS);
     }
-     **/
 
     @Test
-    /**
-     * Test the area function.
-     */
     public void testArea3() {
-        double[] po_a = {2,1,-0.7, -0.02,0.02};
+        double[] po_a = {2, 1, -0.7, -0.02, 0.02};
         double[] po_b = {6, 0.1, -0.2};
-        double x1 = Ex1.sameValue(po_a,po_b, -10,-5, Ex1.EPS);
-        double a1 = Ex1.area(po_a,po_b, x1, 6, 8);
+        double x1 = Ex1.sameValue(po_a, po_b, -10, -5, Ex1.EPS);
+        double a1 = Ex1.area(po_a, po_b, x1, 6, 8);
         double area = 58.5658;
-        assertEquals(a1,area, Ex1.EPS);
+        assertEquals(a1, area, Ex1.EPS);
     }
+
     @Test
     public void testDerivative() {
-        double[] p1= {3,2,6,4};
-        double[] p2= {2,12,12};
-        double[]ans=Ex1.derivative(p1);
-        for(int i=0;i<ans.length;i=i+1) {
-            if (ans[i]!=p2[i]) {
-                fail();
-            }
+        double[] p1 = {3, 2, 6, 4};
+        double[] p2 = {2, 12, 12};
+        double[] ans = Ex1.derivative(p1);
+        for (int i = 0; i < ans.length; i++) {
+            if (ans[i] != p2[i]) fail();
         }
     }
-@Test
-public void testPoly(){
-        double[] p1= {3,2,6,4};
-        if (!Ex1.poly(p1).equals("4.0x^3 +6.0x^2 +2.0x +3.0"))
-        { fail();
-        }
-    }
+
     @Test
-    public void testPolyRandom() {
-        Random rand = new Random();
-        int n = rand.nextInt(10) + 1; // אורך מערך 1-10
-        double[] poly = new double[n];
+    void testPoly() {
+        double[] p1 = {7.0, -1.2, 0.0, -1.0, 3.5};
+        String expected = "3.50x^4 - x^3 - 1.20x + 7.00";
+        assertEquals(expected, Ex1.poly(p1), "Test Case 1 failed: Standard polynomial format error.");
+    }
 
-        // ממלאים את המערך במקדמים רנדומליים (-10 עד 10)
-        for (int i = 0; i < n; i++) {
-            poly[i] = rand.nextDouble() * 20 - 10; // -10 עד 10
-            if (Math.abs(poly[i]) < 1e-12) poly[i] = 0; // אפשר להשאיר אפסים
+    @Test
+    void testPoly2() {
+        double[] p3 = {3.33, -0.99, 5.55, -1.0, 0.0, 1.0, -2.55};
+        String expected = "-2.55x^6 + x^5 - x^3 + 5.55x^2 - 0.99x + 3.33";
+        assertEquals(expected, Ex1.poly(p3), "Test Case 3 failed: Complicated polynomial format error.");
+    }
+
+    // ================= NEW TESTS ==================
+
+    @Test
+    void testLengthLinear() {
+        double[] p = {0, 2}; // y = 2x
+        double len = Ex1.length(p, 0, 3, 3);
+        double dx = (3.0 - 0.0) / 3;
+        double dy = 2 * dx;
+        double expected = Math.sqrt(dx*dx + dy*dy) * 3;
+        assertEquals(expected, len, Ex1.EPS, "Length of linear function incorrect");
+    }
+
+    @Test
+    void testLengthQuadratic() {
+        double[] p = {0, 0, 1}; // y = x^2
+        double len = Ex1.length(p, 0, 1, 1000); // high segments for accuracy
+        assertEquals(1.4789, len, 0.01, "Length of quadratic function incorrect");
+    }
+
+    @Test
+    void testPolynomFromPointsLinear() {
+        double[] xx = {1, 3};
+        double[] yy = {2, 6};
+        double[] coeffs = Ex1.PolynomFromPoints(xx, yy);
+        assertArrayEquals(new double[]{0, 2}, coeffs, 1e-6, "Linear polynomial from points incorrect");
+    }
+
+    @Test
+    void testPolynomFromPointsQuadratic() {
+        double[] xx = {0, 1, 2};
+        double[] yy = {1, 6, 17}; // y = 2x^2 + 3x + 1
+        double[] coeffs = Ex1.PolynomFromPoints(xx, yy);
+        assertArrayEquals(new double[]{1, 2, 3}, coeffs, 1e-6, "Quadratic polynomial from points incorrect");
+    }
+
+    @Test
+    void testPolynomFromPointsQuadratic2() {
+        double[] xx = {0, 1, 2};
+        double[] yy = {6, 1, 17}; // y = 2x^2 - x + 1
+        double[] coeffs = Ex1.PolynomFromPoints(xx, yy);
+
+        // Print coefficients for debugging
+        for (int i = 0; i < coeffs.length; i++) {
+            System.out.println(coeffs[i]); // should print: 1.0 -1.0 2.0
         }
 
-        // בונים מחרוזת צפויה
-        StringBuilder expected = new StringBuilder();
-        boolean first = true;
-        for (int i = poly.length - 1; i >= 0; i--) {
-            double coef = poly[i];
-            if (Math.abs(coef) < 1e-12) continue;
+        // Expected: {constant, linear, quadratic} = {c, b, a}
+        assertArrayEquals(new double[]{6,-15.5, 10.5}, coeffs, 1e-6, "Quadratic polynomial from points incorrect (test 2)");
+    }
 
-            if (!first) expected.append(coef >= 0 ? " +" : " -");
-            else if (coef < 0) expected.append("-");
-            first = false;
 
-            double abs = Math.abs(coef);
-
-            if (i == 0) expected.append(String.format("%.1f", abs));
-            else if (i == 1) {
-                if (Math.abs(abs - 1.0) > 1e-12) expected.append(String.format("%.1f", abs));
-                expected.append("x");
-            } else {
-                if (Math.abs(abs - 1.0) > 1e-12) expected.append(String.format("%.1f", abs));
-                expected.append("x^").append(i);
-            }
-        }
-
-        String result = Ex1.poly(poly);
-        assertEquals(expected.toString(), result);
+    @Test
+    void testPolynomFromPointsInvalid() {
+        double[] xx = {1, 1};
+        double[] yy = {2, 2};
+        assertNull(Ex1.PolynomFromPoints(xx, yy), "Should return null for invalid points (same x values)");
     }
 }

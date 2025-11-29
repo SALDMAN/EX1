@@ -42,44 +42,43 @@ public class Ex1 {
     }
 
     public static double[] PolynomFromPoints(double[] xx, double[] yy) {
-        double [] ans = null;
-        int lx = xx.length;
-        int ly = yy.length;
-
-        if(xx!=null && yy!=null && lx==ly && lx>1 && lx<4) {
-            if (lx == 2) {
-                // קו ישר: y = ax + b
-                double x1 = xx[0], y1 = yy[0];
-                double x2 = xx[1], y2 = yy[1];
-                if (Math.abs(x1 - x2) < EPS) return null;
-
-                double a = (y2 - y1) / (x2 - x1);
-                double b = y1 - a * x1;
-                ans = new double[] {b, a};
-
-            } else if (lx == 3) {
-                // פרבולה: y = ax^2 + bx + c
-                double x1 = xx[0], y1 = yy[0];
-                double x2 = xx[1], y2 = yy[1];
-                double x3 = xx[2], y3 = yy[2];
-
-                double x1_sq = x1 * x1;
-                double x2_sq = x2 * x2;
-                double x3_sq = x3 * x3;
-
-                // הנוסחאות מפתרון מטריצה 3x3 - שיטת דטרמיננטות
-                double det = x1_sq*(x2 - x3) + x2_sq*(x3 - x1) + x3_sq*(x1 - x2);
-
-                if (Math.abs(det) < EPS) return null;
-
-                double a = (y1*(x2 - x3) + y2*(x3 - x1) + y3*(x1 - x2)) / det;
-                double b = (y1*(x3_sq - x2_sq) + y2*(x1_sq - x3_sq) + y3*(x2_sq - x1_sq)) / det;
-                double c = (y1*x2*x3*(x3 - x2) + y2*x1*x3*(x2 - x1) + y3*x1*x2*(x1 - x3)) / det;
-
-                ans = new double[] {c, b, a};
-            }
+        if (xx == null || yy == null || xx.length != yy.length || xx.length < 2 || xx.length > 3) {
+            return null;
         }
-        return ans;
+
+        int n = xx.length;
+
+        if (n == 2) {
+            // Linear: y = a*x + b
+            double x0 = xx[0], y0 = yy[0];
+            double x1 = xx[1], y1 = yy[1];
+
+            if (Math.abs(x0 - x1) < Ex1.EPS) return null;
+
+            double a = (y1 - y0) / (x1 - x0);
+            double b = y0 - a * x0;
+
+            return new double[]{b, a}; // {constant, linear}
+        }
+
+        if (n == 3) {
+            // Quadratic: y = a*x^2 + b*x + c
+            double x0 = xx[0], y0 = yy[0];
+            double x1 = xx[1], y1 = yy[1];
+            double x2 = xx[2], y2 = yy[2];
+
+            // Solve system using determinants (Cramer's rule)
+            double det = x0*x0*(x1 - x2) - x1*x1*(x0 - x2) + x2*x2*(x0 - x1);
+            if (Math.abs(det) < Ex1.EPS) return null;
+
+            double a = (y0*(x1 - x2) - y1*(x0 - x2) + y2*(x0 - x1)) / det;
+            double b = (y0*(x2*x2 - x1*x1) - y1*(x2*x2 - x0*x0) + y2*(x1*x1 - x0*x0)) / det;
+            double c = (y0*(x1*x2*(x1 - x2)) - y1*(x0*x2*(x0 - x2)) + y2*(x0*x1*(x0 - x1))) / det;
+
+            return new double[]{c, b, a}; // {constant, linear, quadratic}
+        }
+
+        return null;
     }
 
     public static boolean equals(double[] p1, double[] p2) {
@@ -94,68 +93,66 @@ public class Ex1 {
     /**
      * Computes a String representing the polynomial function.
      */
+    /**
+     * Computes a String representing the polynomial function.
+     */
+    /**
+     * Computes a String representing the polynomial function with correct signs.
+     */
+    /**
+     * Computes a String representing the polynomial function with correct signs.
+     */
     public static String poly(double[] poly) {
-        if (poly == null || poly.length == 0) return "0";
+        if (poly == null || poly.length == 0) return "0.0";
 
         StringBuilder sb = new StringBuilder();
-        boolean first = true;
+        boolean firstTerm = true;
 
+        // עובר על המקדמים מהדרגה הגבוהה לנמוכה
         for (int i = poly.length - 1; i >= 0; i--) {
             double coef = poly[i];
-            if (Math.abs(coef) < 1e-12) continue; // דלג על 0
 
-            // סימן
-            if (!first) {
-                sb.append(coef >= 0 ? " +" : " -");
+            // דלג על מקדמים אפסיים (תוך שימוש ב-EPS המוגדר במחלקה)
+            if (Math.abs(coef) < EPS) continue;
+
+            // --- טיפול בסימן וברווח ---
+            if (!firstTerm) {
+                // אם זה לא האיבר הראשון:
+                // אם המקדם חיובי, הוסף " + ".
+                // אם המקדם שלילי, הוסף " - ".
+                sb.append(coef >= 0 ? " + " : " - ");
             } else {
+                // אם זה האיבר הראשון:
+                // אם המקדם שלילי, הוסף "-". אחרת, לא מוסיפים סימן +.
                 if (coef < 0) sb.append("-");
-                first = false;
+                firstTerm = false;
             }
 
+            // --- טיפול בערך המקדם ---
             double abs = Math.abs(coef);
 
-            // דרגה 0
+            // דרגה 0 (קבוע)
             if (i == 0) {
-                sb.append(String.format("%.1f", abs));
+                sb.append(String.format("%.2f", abs));
             }
-            // דרגה 1
-            else if (i == 1) {
-                if (Math.abs(abs - 1) > 1e-12)
-                    sb.append(String.format("%.1f", abs));
-                sb.append("x");
-            }
-            // דרגה ≥ 2
+            // דרגה 1 ומעלה (עם x)
             else {
-                if (Math.abs(abs - 1) > 1e-12)
-                    sb.append(String.format("%.1f", abs));
-                sb.append("x^").append(i);
+                // אם המקדם המוחלט שונה מ-1 (בטווח EPS), מדפיסים אותו.
+                if (Math.abs(abs - 1.0) > EPS) {
+                    sb.append(String.format("%.2f", abs));
+                }
+
+                sb.append("x");
+
+                // דרגה > 1
+                if (i > 1) {
+                    sb.append("^").append(i);
+                }
             }
         }
 
-        return first ? "0" : sb.toString();
-    }
-    // פונקציה להערכת פולינום בנקודה x (שווה ל-f)
-    public static double evaluate(double[] p, double x) {
-        return f(p, x);
-    }
-    private static double root_rec2(double[] p1, double[] p2,
-                                   double left, double right, double eps) {
-
-        double fLeft = f(p1, left) - f(p2, left);
-        double fRight = f(p1, right) - f(p2, right);
-
-        // אם אין שינוי סימן, לא נכנסים לפה
-        if (Math.abs(right - left) < eps)
-            return (left + right) / 2.0;
-
-        double mid = (left + right) / 2.0;
-        double fMid = f(p1, mid) - f(p2, mid);
-
-        if (fLeft * fMid <= 0) {
-            return root_rec2(p1, p2, left, mid, eps);
-        } else {
-            return root_rec2(p1, p2, mid, right, eps);
-        }
+        // אין צורך ב-trim() מכיוון שטיפלנו ברווחים באופן מדויק.
+        return firstTerm ? "0.0" : sb.toString();
     }
 
     public static double sameValue(double[] p1, double[] p2,
@@ -239,24 +236,6 @@ public class Ex1 {
     }
 
 
-    // אינטגרציה על קטע קטן עם ערך מוחלט
-    private static double areaSubsegment(double[] p1, double[] p2, double x1, double x2, int segments) {
-        double dx = (x2 - x1) / segments;
-        double area = 0.0;
-        double prevX = x1;
-        double prevY = Math.abs(f(p1, prevX) - f(p2, prevX));
-
-        for (int i = 1; i <= segments; i++) {
-            double currX = x1 + i * dx;
-            double currY = Math.abs(f(p1, currX) - f(p2, currX));
-            area += (prevY + currY) / 2.0 * dx;
-            prevY = currY;
-        }
-
-        return area;
-    }
-
-
 
     // rootBinary מדויק
     private static double rootBinary(double[] p1, double[] p2, double left, double right, double eps) {
@@ -272,69 +251,6 @@ public class Ex1 {
     }
 
 
-    private static double simpson(java.util.function.DoubleUnaryOperator f,
-                                  double a, double b) {
-        double c = (a + b) / 2.0;
-        return (b - a) / 6.0 * (f.applyAsDouble(a)
-                + 4.0 * f.applyAsDouble(c)
-                + f.applyAsDouble(b));
-    }
-
-    private static double adaptiveSimpson(java.util.function.DoubleUnaryOperator f,
-                                          double a, double b, double eps,
-                                          int maxRecDepth) {
-
-        double c = (a + b) / 2.0;
-        double S = simpson(f, a, b);
-        double Sleft = simpson(f, a, c);
-        double Sright = simpson(f, c, b);
-
-        return adaptiveSimpsonAux(f, a, b, eps, S, Sleft, Sright, 0, maxRecDepth);
-    }
-
-    private static double adaptiveSimpsonAux(
-            java.util.function.DoubleUnaryOperator f,
-            double a, double b, double eps,
-            double S, double Sleft, double Sright,
-            int depth, int maxDepth) {
-
-        double c = (a + b) / 2.0;
-        double S2 = Sleft + Sright;
-
-        if (depth >= maxDepth || Math.abs(S2 - S) <= 15.0 * eps) {
-            return S2 + (S2 - S) / 15.0;
-        }
-
-        double leftMid = (a + c) / 2.0;
-        double rightMid = (c + b) / 2.0;
-
-        double Sll = simpson(f, a, c);
-        double Slr = simpson(f, c, b);
-
-        double left = adaptiveSimpsonAux(f, a, c, eps / 2.0,
-                Sleft, simpson(f, a, leftMid), simpson(f, leftMid, c),
-                depth + 1, maxDepth);
-
-        double right = adaptiveSimpsonAux(f, c, b, eps / 2.0,
-                Sright, simpson(f, c, rightMid), simpson(f, rightMid, b),
-                depth + 1, maxDepth);
-
-        return left + right;
-    }
-
-
-
-    // הפונקציה sub נשארת זהה
-    private static double[] sub(double[] p1, double[] p2) {
-        int len = Math.max(p1.length, p2.length);
-        double[] r = new double[len];
-        for (int i = 0; i < len; i++) {
-            double a = (i < p1.length ? p1[i] : 0);
-            double b = (i < p2.length ? p2[i] : 0);
-            r[i] = a - b;
-        }
-        return r;
-    }
 
 
     public static double[] getPolynomFromString(String p) {
