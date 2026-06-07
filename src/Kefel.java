@@ -1,112 +1,107 @@
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 
 public class Kefel {
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            System.out.println("Usage: java Kefel <constant>");
+
+    public static void main(String[] argv) throws IOException {
+        if (argv.length < 1) {
+            System.err.println("Usage: java Kefel <k>");
+            System.exit(1);
+        }
+
+        int k = Integer.parseInt(argv[0]);
+
+        PrintWriter pw = new PrintWriter(new FileWriter("kefel.s"));
+
+        pw.println(".section .text");
+        pw.println(".globl kefel");
+        pw.println("kefel:");
+
+        writeMultiply(pw, k);
+
+        pw.println("\tret");
+        pw.close();
+    }
+
+    static void writeMultiply(PrintWriter pw, int k) {
+        // k=1: just move
+        if (k == 1) {
+            pw.println("\tmovq %rdi,%rax");
             return;
         }
 
-        int k = Integer.parseInt(args[0]);
+        // Rule 1: k = 3, 5, or 9 → use lea
+        if (k == 3) {
+            pw.println("\tleaq (%rdi,%rdi,2),%rax");
+            return;
+        }
+        if (k == 5) {
+            pw.println("\tleaq (%rdi,%rdi,4),%rax");
+            return;
+        }
+        if (k == 9) {
+            pw.println("\tleaq (%rdi,%rdi,8),%rax");
+            return;
+        }
 
-        // תיקון שם הקובץ ל-kefel.s באותיות קטנות בדיוק לפי הדרישות
-        try (PrintWriter out = new PrintWriter(new FileWriter("kefel.s"))) {
-            // כתיבת הפתיח הקבוע של קובץ האסמבלי [cite: 49]
-            out.println(".section .text");
-            out.println(".globl kefel");
-            out.println("kefel:");
+        // Rule 2: power of 2 (single 1-bit) → single shift
+        if (k > 0 && (k & (k - 1)) == 0) {
+            int shift = Integer.numberOfTrailingZeros(k);
+            pw.println("\tmovq %rdi,%rax");
+            pw.println("\tshlq $" + shift + ",%rax");
+            return;
+        }
 
-            // טיפול במקרה קצה שבו k שווה ל-0
-            if (k == 0) {
-                out.println("movq $0, %rax");
-                out.println("ret");
-                return;
-            }
+        // Check if k is a single run of consecutive 1-bits
+        int highBit = 31 - Integer.numberOfLeadingZeros(k);
+        int lowBit  = Integer.numberOfTrailingZeros(k);
+        int runLength = highBit - lowBit + 1;
+        int mask = ((1 << runLength) - 1) << lowBit;
 
-            // כלל 1: אם k הוא 3, 5, או 9 - שימוש בפקודת lea בודדת [cite: 59]
-            if (k == 3 || k == 5 || k == 9) {
-                int scale = k - 1;
-                out.println("leaq (%rdi,%rdi," + scale + "), %rax");
-                out.println("ret");
-                return;
-            }
-
-            // ניתוח המבנה הבינארי של המספר לצורך שאר הכללים
-            int lowestSetBit = Integer.numberOfTrailingZeros(k);
-            int highestSetBit = 31 - Integer.numberOfLeadingZeros(k);
-            int bitCount = Integer.bitCount(k);
-            int blockLength = highestSetBit - lowestSetBit + 1;
-
-            // כלל 2: אם k מכיל ביט אחד בלבד של 1 (חזקה של 2) -> הזזה אחת [cite: 60]
-            if (bitCount == 1) {
-                out.println("movq %rdi, %rax");
-                if (lowestSetBit > 0) {
-                    // כאן היה ה-Typo המתוקן:
-                    out.println("shlq $" + lowestSetBit + ", %rax");
+        if (k == mask) {
+            if (runLength == 2) {
+                // Rule 3: 2 consecutive bits → add of two shifts
+                pw.println("\tmovq %rdi,%rax");
+                pw.println("\tshlq $" + (lowBit + 1) + ",%rax");
+                if (lowBit == 0) {
+                    pw.println("\taddq %rdi,%rax");
+                } else {
+                    pw.println("\tmovq %rdi,%rcx");
+                    pw.println("\tshlq $" + lowBit + ",%rcx");
+                    pw.println("\taddq %rcx,%rax");
                 }
-                out.println("ret");
-                return;
-            }
-
-            // כלל 3: אם k מכיל בדיוק 2 ביטים של 1 -> חיבור של שתי הזזות [cite: 61]
-            if (bitCount == 2) {
-                int firstBit = lowestSetBit;
-                int secondBit = 31 - Integer.numberOfLeadingZeros(k ^ (1 << firstBit));
-
-                out.println("movq %rdi, %rax");
-                if (secondBit > 0) {
-                    out.println("shlq $" + secondBit + ", %rax");
+            } else {
+                // Rule 4: 3+ consecutive bits → subtract of two shifts
+                pw.println("\tmovq %rdi,%rax");
+                pw.println("\tshlq $" + (highBit + 1) + ",%rax");
+                if (lowBit == 0) {
+                    pw.println("\tsubq %rdi,%rax");
+                } else {
+                    pw.println("\tmovq %rdi,%rcx");
+                    pw.println("\tshlq $" + lowBit + ",%rcx");
+                    pw.println("\tsubq %rcx,%rax");
                 }
-                out.println("movq %rdi, %rcx");
-                if (firstBit > 0) {
-                    out.println("shlq $" + firstBit + ", %rcx");
-                }
-                out.println("addq %rcx, %rax");
-                out.println("ret");
-                return;
             }
+            return;
+        }
 
-            // כלל 4: אם k הוא רצף אחד של 3 ביטים או יותר של 1 -> חיסור של שתי הזזות [cite: 62]
-            if (bitCount >= 3 && blockLength == bitCount) {
-                int shiftHigher = highestSetBit + 1;
-                int shiftLower = lowestSetBit;
-
-                out.println("movq %rdi, %rax");
-                out.println("shlq $" + shiftHigher + ", %rax");
-                out.println("movq %rdi, %rcx");
-                if (shiftLower > 0) {
-                    out.println("shlq $" + shiftLower + ", %rcx");
-                }
-                out.println("subq %rcx, %rax");
-                out.println("ret");
-                return;
-            }
-
-            // ברירת מחדל / כלל גנרי למספרים מורכבים (שמירה על מינימום שורות) [cite: 63]
-            boolean first = true;
-            for (int i = 0; i <= highestSetBit; i++) {
-                if ((k & (1 << i)) != 0) {
-                    if (first) {
-                        out.println("movq %rdi, %rax");
-                        if (i > 0) {
-                            out.println("shlq $" + i + ", %rax");
-                        }
-                        first = false;
+        // General case: multiple runs → sum individual shifts for each set bit
+        boolean first = true;
+        for (int i = 31; i >= 0; i--) {
+            if ((k & (1 << i)) != 0) {
+                if (first) {
+                    pw.println("\tmovq %rdi,%rax");
+                    if (i > 0) pw.println("\tshlq $" + i + ",%rax");
+                    first = false;
+                } else {
+                    if (i == 0) {
+                        pw.println("\taddq %rdi,%rax");
                     } else {
-                        out.println("movq %rdi, %rcx");
-                        if (i > 0) {
-                            out.println("shlq $" + i + ", %rcx");
-                        }
-                        out.println("addq %rcx, %rax");
+                        pw.println("\tmovq %rdi,%rcx");
+                        pw.println("\tshlq $" + i + ",%rcx");
+                        pw.println("\taddq %rcx,%rax");
                     }
                 }
             }
-            out.println("ret");
-
-        } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
         }
     }
 }
